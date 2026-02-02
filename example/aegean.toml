@@ -1,0 +1,37 @@
+soundfont = "aegean/AegeanSymphonicOrchestra-v2_5-universal.sf2"
+
+[[instr."Staff_violinI:"]]
+bank = 40
+preset = 40
+pan = -0.6
+
+[[instr."Staff_violinII:"]]
+bank = 40
+preset = 40
+pan = -0.4
+
+[[instr."Staff_viola:"]]
+bank = 40
+preset = 41
+pan = -0.3
+
+[[instr."Staff_continuo:"]]
+bank = 40
+preset = 42
+pan = 0.5
+
+[[instr."Staff_continuo:"]]
+bank = 40
+preset = 43
+pan = 0.7
+tsp = -12
+
+[[instr."upper:"]]
+bank = 0
+preset = 6
+pan = 0.3
+
+[[instr."lower:"]]
+bank = 0
+preset = 6
+pan = 0.3
