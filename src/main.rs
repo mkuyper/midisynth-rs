@@ -470,8 +470,12 @@ fn midisynth() -> Result<(), String> {
     Ok(())
 }
 
-fn main() {
-    if let Err(msg) = midisynth() {
-        println!("{}: {}", console::style("Error").red().bold(), msg);
+fn main() -> std::process::ExitCode {
+    match midisynth() {
+        Ok(_) => std::process::ExitCode::SUCCESS,
+        Err(msg) => {
+            println!("{}: {}", console::style("Error").red().bold(), msg);
+            std::process::ExitCode::FAILURE
+        }
     }
 }
