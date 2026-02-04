@@ -4,6 +4,7 @@
 // which is part of this source code package.
 
 use std::io::Read;
+use resolve_path::PathResolveExt;
 
 struct SequencedTrack<'a> {
     track: std::vec::IntoIter<midly::TrackEvent<'a>>,
@@ -351,7 +352,14 @@ fn midisynth() -> Result<(), String> {
         .get("soundfont")
         .and_then(|v| v.as_str())
         .ok_or("Invalid configuration: No soundfont specified")?;
-    let mut sf_file = std::fs::File::open(sf_fname)
+
+    let sf_resolved = sf_fname.try_resolve_in(args.config.path().parent().unwrap());
+    let sf_resolved_name = match sf_resolved {
+        Ok(ref p) => p.to_str().unwrap(),
+        _ => sf_fname,
+    };
+
+    let mut sf_file = std::fs::File::open(sf_resolved_name)
         .map_err(|e| format!("Opening soundfont file {} failed: {}", sf_fname, e))?;
     let sf_object = std::sync::Arc::new(
         rustysynth::SoundFont::new(&mut sf_file)
