@@ -157,7 +157,7 @@ impl InstrumentSetting {
                 .get("bank")
                 .and_then(|v| v.as_integer())
                 .and_then(|v| Some(v as u8))
-                .ok_or("Missing bank value")?,
+                .unwrap_or(0),
 
             preset: setting
                 .get("preset")
