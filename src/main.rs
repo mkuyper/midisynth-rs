@@ -3,8 +3,8 @@
 // This file is subject to the terms and conditions defined in file 'LICENSE',
 // which is part of this source code package.
 
-use std::io::Read;
 use resolve_path::PathResolveExt;
+use std::io::Read;
 
 struct SequencedTrack<'a> {
     track: std::vec::IntoIter<midly::TrackEvent<'a>>,
@@ -325,6 +325,12 @@ mod args {
     }
 }
 
+fn resolve(name: &str, relative: &std::path::Path) -> Option<String> {
+    let relative = relative.parent()?.canonicalize().ok()?;
+    let resolved = name.try_resolve_in(relative).ok()?;
+    Some(resolved.to_str().unwrap().to_string())
+}
+
 fn midisynth() -> Result<(), String> {
     let mut args = <args::Args as clap::Parser>::parse();
 
@@ -351,15 +357,10 @@ fn midisynth() -> Result<(), String> {
     let sf_fname = config
         .get("soundfont")
         .and_then(|v| v.as_str())
-        .ok_or("Invalid configuration: No soundfont specified")?;
+        .ok_or("Invalid configuration: No soundfont specified")
+        .map(|s| resolve(&s, args.config.path().path()).unwrap_or(s.to_string()))?;
 
-    let sf_resolved = sf_fname.try_resolve_in(args.config.path().parent().unwrap());
-    let sf_resolved_name = match sf_resolved {
-        Ok(ref p) => p.to_str().unwrap(),
-        _ => sf_fname,
-    };
-
-    let mut sf_file = std::fs::File::open(sf_resolved_name)
+    let mut sf_file = std::fs::File::open(&sf_fname)
         .map_err(|e| format!("Opening soundfont file {} failed: {}", sf_fname, e))?;
     let sf_object = std::sync::Arc::new(
         rustysynth::SoundFont::new(&mut sf_file)
