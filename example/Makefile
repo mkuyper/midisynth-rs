@@ -2,12 +2,14 @@ default: bwv1055-mov1-allegro.wav bwv1055-mov2-larghetto.wav bwv1055-mov3-allegr
 
 MIDISYNTH := ../target/release/midisynth-rs
 
+CONFIG ?= aegean.toml
+
 ifneq (, $(shell test -x "$(MIDISYNTH)" || echo nope))
 $(error "$(MIDISYNTH)" is not executable or does not exist. Please run 'cargo build --release' at the top level)
 endif
 
 %.wav: %.mid | aegean/AegeanSymphonicOrchestra-v2_5-universal.sf2
-	"$(MIDISYNTH)" --config aegean.toml $< $@
+	"$(MIDISYNTH)" --config $(CONFIG) $< $@
 
 aegean/AegeanSymphonicOrchestra-v2_5-universal.sf2:
 	$(MAKE) -C aegean
