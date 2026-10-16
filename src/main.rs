@@ -85,6 +85,7 @@ impl<'a> Sequencer<'a> {
     fn play_all(
         &mut self,
         timing: midly::Timing,
+        t_scale: f32,
         pbar: indicatif::ProgressBar,
     ) -> Vec<PlayerTrack> {
         let mut tracks: Vec<_> = std::iter::repeat_with(|| PlayerTrack::default())
@@ -95,6 +96,8 @@ impl<'a> Sequencer<'a> {
             midly::Timing::Metrical(tpb) => usize::from(tpb.as_int()),
             _ => todo!(),
         };
+        let ticks_per_beat = (ticks_per_beat as f32 * t_scale).round() as usize;
+
         let mut tempo: usize = 500_000;
 
         let mut base_time: usize = 0;
@@ -327,6 +330,10 @@ mod args {
         #[arg(short, long)]
         pub config: clio::Input,
 
+        /// Timing scalar
+        #[arg(long)]
+        pub tscale: Option<f32>,
+
         /// Input MIDI file
         pub midifile: clio::Input,
 
@@ -398,7 +405,7 @@ fn midisynth() -> Result<(), String> {
             .collect(),
     };
 
-    let tracks = seq.play_all(mf_object.header.timing, pbar);
+    let tracks = seq.play_all(mf_object.header.timing, args.tscale.unwrap_or(1.0), pbar);
 
     // Render tracks
     let mpbar = indicatif::MultiProgress::new();
