@@ -131,6 +131,16 @@ impl<'a> Sequencer<'a> {
                         velocity: v.into(),
                     });
                 }
+                midly::TrackEventKind::Midi {
+                    channel: _,
+                    message: midly::MidiMessage::NoteOff { key: k, vel: _ },
+                } => {
+                    tracks[e.idx].events.push(PlayerEvent {
+                        time,
+                        note: k.into(),
+                        velocity: 0,
+                    });
+                }
                 _ => { /* println!("skipping: {:?}", e); */ }
             };
             pbar.inc(1);
