@@ -334,6 +334,10 @@ mod args {
         #[arg(long)]
         pub tscale: Option<f32>,
 
+        /// Highlight
+        #[arg(long)]
+        pub highlight: Option<String>,
+
         /// Input MIDI file
         pub midifile: clio::Input,
 
@@ -452,6 +456,12 @@ fn midisynth() -> Result<(), String> {
                 pbar.set_style(sty.clone());
                 pbar.set_message(track_name.clone());
 
+                let gain_off: f32 = match args.highlight {
+                    None => 0.0,
+                    Some(ref s) if s == track_name => 6.0,
+                    _ => -6.0,
+                };
+
                 let mut renderer = Renderer {
                     synth: synth_object,
                     track: track.clone(),
@@ -464,7 +474,7 @@ fn midisynth() -> Result<(), String> {
                         left,
                         right,
                         gainfactors: MixerGainFactors::new(
-                            is.gain.unwrap_or(0f32),
+                            is.gain.unwrap_or(0f32) + gain_off,
                             is.pan.unwrap_or(0f32),
                         ),
                     }
