@@ -338,6 +338,10 @@ mod args {
         #[arg(long)]
         pub highlight: Option<String>,
 
+        /// Tacet
+        #[arg(long)]
+        pub tacet: Option<String>,
+
         /// Input MIDI file
         pub midifile: clio::Input,
 
@@ -446,6 +450,11 @@ fn midisynth() -> Result<(), String> {
                             .ok();
                         continue;
                     }
+                };
+
+                match args.tacet {
+                    Some(ref s) if s == track_name => continue,
+                    _ => ()
                 };
 
                 let synth_settings = rustysynth::SynthesizerSettings::new(44100);
